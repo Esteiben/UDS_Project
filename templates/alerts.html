@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Alertas - UDS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fa-solid fa-bell me-2"></i>Centro de Alertas
+        {% set unread = alerts | selectattr('is_read', 'false') | list | length %}
+        {% if unread > 0 %}
+            <span class="badge bg-danger ms-2 rounded-pill">{{ unread }} sin leer</span>
+        {% endif %}
+    </h2>
+    <div>
+        <a href="/alerts/generate" class="btn btn-warning me-2">
+            <i class="fa-solid fa-magnifying-glass-chart me-1"></i> Detectar Alertas
+        </a>
+        <button class="btn btn-outline-secondary" onclick="location.reload()">
+            <i class="fa-solid fa-arrows-rotate me-1"></i> Actualizar
+        </button>
+    </div>
+</div>
+
+<!-- Resumen rápido por severidad -->
+<div class="row mb-4">
+    {% set critical = alerts | selectattr('severity', 'equalto', 'CRITICAL') | list | length %}
+    {% set high = alerts | selectattr('severity', 'equalto', 'HIGH') | list | length %}
+    {% set medium = alerts | selectattr('severity', 'equalto', 'MEDIUM') | list | length %}
+    {% set low = alerts | selectattr('severity', 'equalto', 'LOW') | list | length %}
+    <div class="col-md-3">
+        <div class="card border-danger text-center">
+            <div class="card-body">
+                <i class="fa-solid fa-circle-exclamation fa-2x text-danger mb-2"></i>
+                <h5 class="card-title text-danger">{{ critical }}</h5>
+                <small class="text-muted">Críticas</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-warning text-center">
+            <div class="card-body">
+                <i class="fa-solid fa-triangle-exclamation fa-2x text-warning mb-2"></i>
+                <h5 class="card-title text-warning">{{ high }}</h5>
+                <small class="text-muted">Altas</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-info text-center">
+            <div class="card-body">
+                <i class="fa-solid fa-circle-info fa-2x text-info mb-2"></i>
+                <h5 class="card-title text-info">{{ medium }}</h5>
+                <small class="text-muted">Medias</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-secondary text-center">
+            <div class="card-body">
+                <i class="fa-solid fa-circle-check fa-2x text-secondary mb-2"></i>
+                <h5 class="card-title text-secondary">{{ low }}</h5>
+                <small class="text-muted">Bajas</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de alertas -->
+<div class="card shadow">
+    <div class="card-body p-0">
+        {% if alerts %}
+        <div class="list-group list-group-flush">
+            {% for alert in alerts %}
+            <div class="list-group-item list-group-item-action d-flex align-items-start p-3 
+                        {% if not alert.is_read %}bg-light{% endif %}
+                        {% if alert.severity == 'CRITICAL' %}border-start border-danger border-4
+                        {% elif alert.severity == 'HIGH' %}border-start border-warning border-4
+                        {% elif alert.severity == 'MEDIUM' %}border-start border-info border-4
+                        {% else %}border-start border-secondary border-4{% endif %}">
+                <!-- Icono de severidad -->
+                <div class="me-3 mt-1">
+                    {% if alert.severity == 'CRITICAL' %}
+                        <i class="fa-solid fa-circle-exclamation fa-2x text-danger"></i>
+                    {% elif alert.severity == 'HIGH' %}
+                        <i class="fa-solid fa-triangle-exclamation fa-2x text-warning"></i>
+                    {% elif alert.severity == 'MEDIUM' %}
+                        <i class="fa-solid fa-circle-info fa-2x text-info"></i>
+                    {% else %}
+                        <i class="fa-solid fa-circle-check fa-2x text-secondary"></i>
+                    {% endif %}
+                </div>
+                <!-- Contenido -->
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="mb-1">
+                            <span class="badge 
+                                {% if alert.severity == 'CRITICAL' %}bg-danger
+                                {% elif alert.severity == 'HIGH' %}bg-warning text-dark
+                                {% elif alert.severity == 'MEDIUM' %}bg-info text-dark
+                                {% else %}bg-secondary{% endif %} me-2">
+                                {{ alert.severity }}
+                            </span>
+                            {{ alert.alert_type }}
+                        </h6>
+                        <small class="text-muted">{{ alert.created_at }}</small>
+                    </div>
+                    <p class="mb-1">{{ alert.message }}</p>
+                    <small>
+                        {% if alert.is_read %}
+                            <i class="fa-solid fa-circle-check text-success me-1"></i> Atendida
+                        {% else %}
+                            <i class="fa-solid fa-circle text-danger me-1"></i> Pendiente
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="fa-solid fa-bell-slash fa-3x mb-3"></i>
+            <h5>No hay alertas registradas</h5>
+            <p>Cuando se detecten anomalías en los viajes, aparecerán aquí.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

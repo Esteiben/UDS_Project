@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Reportes - UDS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa-solid fa-file-pdf me-2"></i>Reportes Generados</h2>
+    <a href="/reports/generate" class="btn btn-primary">
+        <i class="fa-solid fa-plus me-1"></i> Generar Nuevo Reporte
+    </a>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Tipo de Reporte</th>
+                        <th>Fecha</th>
+                        <th>Parámetros</th>
+                        <th class="text-center">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reports %}
+                    <tr>
+                        <td>{{ r.report_id }}</td>
+                        <td>
+                            {% if r.company_name %}
+                                {{ r.company_name }}
+                            {% else %}
+                                <span class="text-muted">Cliente ID: {{ r.client_id }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ r.report_type }}</td>
+                        <td>{{ r.generated_date.strftime('%d/%m/%Y %H:%M') if r.generated_date else '-' }}</td>
+                        <td><code>{{ r.parameters_used }}</code></td>
+                        <td class="text-center">
+                            <a href="/download_report/{{ r.report_id }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-download me-1"></i> Descargar PDF
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-file-circle-exclamation fa-2x mb-2"></i><br>
+                            No hay reportes generados. Crea uno nuevo con el botón "Generar Nuevo Reporte".
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

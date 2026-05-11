@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - UDS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <!-- Tarjeta 1: Total Viajes -->
+    <div class="col-md-3 mb-3">
+        <div class="card card-kpi text-white bg-primary shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-uppercase">Total Viajes</h6>
+                        <h3 class="mb-0">{{ kpi_trips }}</h3>
+                    </div>
+                    <i class="fa-solid fa-taxi fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Tarjeta 2: Ingresos Totales -->
+    <div class="col-md-3 mb-3">
+        <div class="card card-kpi text-white bg-success shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-uppercase">Ingresos Totales</h6>
+                        <h3 class="mb-0">{{ kpi_revenue }}</h3>
+                    </div>
+                    <i class="fa-solid fa-dollar-sign fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Tarjeta 3: Zonas Activas -->
+    <div class="col-md-3 mb-3">
+        <div class="card card-kpi text-white bg-warning shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-uppercase">Zonas Activas</h6>
+                        <h3 class="mb-0">{{ kpi_zones }}</h3>
+                    </div>
+                    <i class="fa-solid fa-map-marker-alt fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Tarjeta 4: Tarifa Media -->
+    <div class="col-md-3 mb-3">
+        <div class="card card-kpi text-white bg-info shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-uppercase">Tarifa Media</h6>
+                        <h3 class="mb-0">{{ kpi_avg_fare }}</h3>
+                    </div>
+                    <i class="fa-solid fa-receipt fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráfico del análisis -->
+<div class="card shadow">
+    <div class="card-header bg-white fw-bold">
+        <i class="fa-solid fa-chart-bar me-2"></i>Análisis de Movilidad - Toma de Decisiones
+    </div>
+    <div class="card-body text-center">
+        {% if plot_url %}
+            <img src="data:image/png;base64,{{ plot_url }}" alt="Dashboard" class="img-fluid">
+        {% else %}
+            <div class="alert alert-warning">No se pudo generar el gráfico. Verifica los datos.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

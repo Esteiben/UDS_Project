@@ -1,0 +1,9 @@
+<!-- templates/upload.html -->
+{% extends "base.html" %}
+{% block content %}
+<h1>Cargar Dataset de Taxis</h1>
+<form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="csv_file" accept=".csv">
+    <button type="submit" class="btn">Procesar e Ingresar a PostgreSQL</button>
+</form>
+{% endblock %}

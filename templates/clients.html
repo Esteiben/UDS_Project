@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Clientes - UDS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa-solid fa-building me-2"></i>Gestión de Clientes</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClientModal">
+        <i class="fa-solid fa-plus me-1"></i> Nuevo Cliente
+    </button>
+</div>
+
+<!-- Tabla de clientes -->
+<div class="card shadow">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Empresa</th>
+                        <th>Contacto</th>
+                        <th>Email</th>
+                        <th>Plan</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.client_id }}</td>
+                        <td><strong>{{ client.company_name }}</strong></td>
+                        <td>{{ client.contact_name }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>
+                            {% if client.subscription_plan == 1 %}
+                                <span class="badge bg-secondary">Básico</span>
+                            {% elif client.subscription_plan == 2 %}
+                                <span class="badge bg-success">Pro</span>
+                            {% elif client.subscription_plan == 3 %}
+                                <span class="badge bg-warning text-dark">Empresarial</span>
+                            {% else %}
+                                <span class="badge bg-light text-dark">Desconocido</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <!-- Botón eliminar con confirmación modal -->
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ client.client_id }}">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                            <!-- Modal de confirmación -->
+                            <div class="modal fade" id="deleteModal{{ client.client_id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title">Confirmar eliminación</h6>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ¿Eliminar a <strong>{{ client.company_name }}</strong>?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <form action="/client/delete/{{ client.client_id }}" method="POST">
+                                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-building-circle-exclamation fa-2x mb-2"></i><br>
+                            No hay clientes registrados. Crea uno con el botón "Nuevo Cliente".
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar nuevo cliente -->
+<div class="modal fade" id="addClientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/client/add" method="POST">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fa-solid fa-user-plus me-2"></i>Nuevo Cliente</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="company_name" class="form-label">Nombre de la empresa *</label>
+                        <input type="text" class="form-control" id="company_name" name="company_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact_name" class="form-label">Persona de contacto *</label>
+                        <input type="text" class="form-control" id="contact_name" name="contact_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo electrónico *</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subscription_plan" class="form-label">Plan de suscripción</label>
+                        <select class="form-select" id="subscription_plan" name="subscription_plan" required>
+                            <option value="">Seleccione...</option>
+                            <option value="1">Básico</option>
+                            <option value="2">Pro</option>
+                            <option value="3">Empresarial</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

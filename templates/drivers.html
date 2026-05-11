@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Conductores - UDS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa-solid fa-id-card me-2"></i>Gestión de Conductores</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDriverModal">
+        <i class="fa-solid fa-plus me-1"></i> Nuevo Conductor
+    </button>
+</div>
+
+<!-- Tabla de conductores -->
+<div class="card shadow">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Licencia</th>
+                        <th>Contratación</th>
+                        <th>Rating</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for driver in drivers %}
+                    <tr>
+                        <td>{{ driver.driver_id }}</td>
+                        <td>{{ driver.first_name }}</td>
+                        <td>{{ driver.last_name }}</td>
+                        <td><code>{{ driver.license_number }}</code></td>
+                        <td>{{ driver.hire_date }}</td>
+                        <td>
+                            {% set rating = driver.rating|float %}
+                            {% if rating >= 4.5 %}
+                                <span class="badge bg-success">{{ rating }}</span>
+                            {% elif rating >= 3.0 %}
+                                <span class="badge bg-warning text-dark">{{ rating }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ rating }}</span>
+                            {% endif %}
+                            <div class="text-warning small">
+                                {% for i in range(1,6) %}
+                                    {% if i <= rating|int %}
+                                        <i class="fa-solid fa-star"></i>
+                                    {% elif i - rating < 1 %}
+                                        <i class="fa-solid fa-star-half-stroke"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteDriverModal{{ driver.driver_id }}">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                            <!-- Modal de confirmación -->
+                            <div class="modal fade" id="deleteDriverModal{{ driver.driver_id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title">Confirmar eliminación</h6>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ¿Eliminar a <strong>{{ driver.first_name }} {{ driver.last_name }}</strong>?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <form action="/driver/delete/{{ driver.driver_id }}" method="POST">
+                                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-user-slash fa-2x mb-2"></i><br>
+                            No hay conductores registrados. Crea uno con el botón "Nuevo Conductor".
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar nuevo conductor -->
+<div class="modal fade" id="addDriverModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/driver/add" method="POST">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fa-solid fa-user-plus me-2"></i>Nuevo Conductor</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="first_name" class="form-label">Nombre *</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="last_name" class="form-label">Apellido *</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="license_number" class="form-label">Número de Licencia *</label>
+                        <input type="text" class="form-control" id="license_number" name="license_number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Rating (1.0 - 5.0) *</label>
+                        <input type="number" class="form-control" id="rating" name="rating" step="0.1" min="1" max="5" value="5.0" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Conductor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
